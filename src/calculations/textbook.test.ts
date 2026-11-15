@@ -90,8 +90,9 @@ describe("question inventory", () => {
     for (const question of questions) {
       expect(question.statement.length).toBeGreaterThan(0)
       expect(question.steps.length).toBeGreaterThan(0)
-      expect(question.verification.length).toBeGreaterThan(0)
-      expect(question.finals.length).toBeGreaterThan(0)
+      expect(question.verification).toBe("Completed with stated assumptions")
+      expect(question.steps.some((step) => step.status === "blocked" || step.status === "chart")).toBe(false)
+      expect(question.finals.some((item) => item.label === "Decision" || item.label === "Preliminary design" || item.text.length > 0)).toBe(true)
     }
   })
 })

@@ -89,7 +89,7 @@ export type Question = {
   missing: string[]
   formulaIds: string[]
   steps: Step[]
-  verification: "Independently calculated and checked" | "Incomplete due to missing source information" | "Requires chart or source verification"
+  verification: "Independently calculated and checked" | "Incomplete due to missing source information" | "Requires chart or source verification" | "Completed with stated assumptions"
   verificationNote: string
   finals: { label: string; text: string }[]
   diagram:

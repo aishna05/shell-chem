@@ -56,7 +56,7 @@ export function AppShell() {
       </aside>
       <div>
         <header className="no-print flex items-center justify-between border-b border-line px-4 py-3 md:px-8">
-          <p className="text-sm text-muted">Volume 6, 4th edition. Charts are the cropped book figures. Unread ordinates stay blank.</p>
+          <p className="text-sm text-muted">Volume 6, 4th edition. Missing properties are labeled assumptions and the solutions are closed with them.</p>
           <button type="button" onClick={toggleTheme} className="rounded-md border border-line px-3 py-1.5 text-sm">
             {store.theme === "dark" ? "Light theme" : "Dark theme"}
           </button>

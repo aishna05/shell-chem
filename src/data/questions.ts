@@ -12,6 +12,7 @@ import {
   type Calc,
 } from "../calculations/textbook"
 import type { CalculatorRow, Question, Step } from "./types"
+import { applyClosures } from "../calculations/finish"
 import { moreQuestions } from "./moreQuestions"
 
 function computed(
@@ -809,5 +810,7 @@ export const questions: Question[] = [
 ]
 
 questions.push(...moreQuestions)
+
+applyClosures(questions)
 
 export const questionById = new Map(questions.map((question) => [question.id, question]))

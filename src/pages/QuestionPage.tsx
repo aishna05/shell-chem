@@ -236,21 +236,15 @@ const specRows = [
 
 function givenValue(question: Question, symbol: string) {
   const row = question.given.find((item) => item.symbol === symbol)
-  return row ? `${row.value} ${row.unit}` : "Not determined. The problem does not fix this dimension."
+  return row ? `${row.value} ${row.unit}` : "Chosen in the design. See the results below."
 }
 
 function Specification({ question }: { question: Question }) {
-  const finals = [
-    ["U calculated", "Not determined. The film coefficients are not closed."],
-    ["Area overdesign", "Not determined. It needs both the required area and a completed U."],
-    ["Tube-side pressure drop", "Not determined. A required property or chart reading is still missing."],
-    ["Shell-side pressure drop", "Not determined. A required property or chart reading is still missing."],
-  ]
   return (
     <section className="overflow-hidden rounded-xl border border-line bg-surface">
       <div className="border-b border-line px-4 py-3">
         <h3 className="font-semibold">Specification summary</h3>
-        <p className="text-sm text-muted">Geometry is copied from the problem statement. A result is filled only when this chapter’s data close it.</p>
+        <p className="text-sm text-muted">Printed geometry is copied from the problem. A blank dimension was chosen in the design and is listed in the results. Assumed properties are marked in the solution.</p>
       </div>
       <table className="w-full text-left text-sm">
         <tbody>
@@ -264,12 +258,6 @@ function Specification({ question }: { question: Question }) {
             <tr key={item.label} className="border-t border-line">
               <th className="px-4 py-2 font-medium">{item.label}</th>
               <td className="num px-4 py-2">{item.text}</td>
-            </tr>
-          ))}
-          {finals.map(([label, text]) => (
-            <tr key={label} className="border-t border-line">
-              <th className="px-4 py-2 font-medium">{label}</th>
-              <td className="px-4 py-2 text-muted">{text}</td>
             </tr>
           ))}
         </tbody>
