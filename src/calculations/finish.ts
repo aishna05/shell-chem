@@ -220,7 +220,7 @@ function designKettle() {
   const duty = 1_162_698
   const area = must(outsideArea(50, 0.03, 4.8), "12.6 area").value
   const flux = duty / area
-  const boiling = 1500
+  const boiling = 2000
   const u = overallOutside({ ho: boiling, hi: 8000, outsideM: 0.03, insideM: 0.025, conductivity: 45, shellFouling: 0.0002, tubeFouling: 0.0001 }).value
   const needed = duty / (area * delta)
   return { delta, duty, area, flux, boiling, u, needed, steam: steam17 }
@@ -556,7 +556,7 @@ function close126() {
   return {
     assumptions: [
       `Steam at 1.7 bara: Tsat = ${sig(kettle.steam.temperature)}°C from the Antoine fit. ho = 8000 W/m²°C.`,
-      "Process-side boiling coefficient assumed as 1500 W/m²°C, because Mostinski’s equation needs a critical pressure and Forster–Zuber needs the wall temperature. Neither is printed.",
+      "Process-side boiling coefficient assumed as 2000 W/m²°C, because Mostinski’s equation needs a critical pressure and Forster–Zuber needs the wall temperature. Neither is printed.",
       "Steam-side fouling 0.0001 m²°C/W and process fouling 0.0002 m²°C/W.",
     ],
     steps: [
@@ -567,7 +567,7 @@ function close126() {
       ], kettle.delta, "°C", assumptionNote),
       step("u-a", "Coefficient required and provided", "The critical-flux check is already above. This step asks whether the steam temperature can drive the duty through the assumed boiling coefficient.", "U = Q/(A\\Delta T)", "Equations 12.1 and 12.2.", [
         `U required = ${sig(kettle.needed)} W/m²°C`,
-        `U from ho = 8000 and hb = 1500 is ${sig(kettle.u)} W/m²°C`,
+        `U from ho = 8000 and hb = 2000 is ${sig(kettle.u)} W/m²°C`,
         `Required flux ${sig(kettle.flux)} W/m² remains below 0.7 qcb.`,
       ], kettle.u, "W/m²°C", assumptionNote),
     ],
