@@ -8,12 +8,12 @@ type Store = {
   theme: "dark" | "light"
 }
 
-const KEY = "shell-tube-exam-progress-v1"
+const KEY = "shell-tube-exam-progress-v2"
 
 const initial: Store = {
   mastery: {},
   lastQuestionId: "12.5",
-  theme: "dark",
+  theme: "light",
 }
 
 function read(): Store {

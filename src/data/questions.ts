@@ -24,6 +24,7 @@ function computed(
   calc: Extract<Calc, { ok: true }>,
   verification: string,
   mistake: string,
+  figures: Step["figures"] = [],
 ): Step {
   return {
     id,
@@ -40,6 +41,7 @@ function computed(
     verification,
     mistake,
     status: "computed",
+    figures,
   }
 }
 
@@ -81,6 +83,7 @@ function chartStep(
   variables: Step["variables"],
   instruction: string,
   mistake: string,
+  figures: Step["figures"] = [],
 ): Step {
   return {
     id,
@@ -91,12 +94,13 @@ function chartStep(
     variables,
     substitutionTex: instruction,
     arithmetic: [instruction],
-    resultText: "Chart value not digitized.",
+    resultText: "Chart ordinate not digitized.",
     value: null,
     unit: "",
-    verification: "Requires chart or source verification. No number has been read off the figure by this program.",
+    verification: "The figure is shown and the entry coordinates are stated. No ordinate has been read off the curve.",
     mistake,
     status: "chart",
+    figures,
   }
 }
 
@@ -484,7 +488,7 @@ export const questions: Question[] = [
     ],
     missing: [
       "Water specific heat and density, so the water flow and the tube velocity cannot be calculated.",
-      "jh from Figure 12.29 and jf from Figure 12.30. The figures are printed, but their curves are not tabulated.",
+      "The ordinates of Figure 12.29 and Figure 12.30 at the calculated Reynolds number. The charts are embedded, but a single curve reading has not been digitized.",
       "A named fouling row for ammonia. Table 12.2 is not used to invent one.",
     ],
     formulaIds: ["12.1", "12.4", "12.5", "12.6", "12.7", "12.8", "12.21", "12.23", "12.25", "12.26"],
@@ -545,6 +549,13 @@ export const questions: Question[] = [
         ammoniaFt,
         `Ft = ${sig(ammoniaFt.value)}. The book says an economic design is not normally made when Ft falls below about 0.75. This value is above that limit. Example 12.1’s chart reading of 0.85 agrees with equation 12.8 to within ordinary chart-reading accuracy (the equation gives 0.835 for that example).`,
         "Declaring the exchanger impossible because R is large, without evaluating equation 12.8. For these temperatures the equation does have a value.",
+        [
+          {
+            src: "/book-assets/fig-12-19-ft-one-shell.png",
+            caption: "Figure 12.19. Temperature correction factor: one shell pass; two or more even tube passes. Book p. 657.",
+            reading: "Entry coordinates for this problem: R = 8 and S = 0.111. The number used in the solution is the value of equation 12.8, which is the relation drawn on this figure. The R = 8 curve is steep here, so a chart pick is not substituted for the equation.",
+          },
+        ],
       ),
       computed(
         "dtm",
@@ -647,8 +658,32 @@ export const questions: Question[] = [
         "\\frac{h_s d_e}{k}=j_h Re Pr^{1/3}(\\mu/\\mu_w)^{0.14}",
         `Figure 12.29, p. 673. Enter at Re = ${sig(ammoniaFlow.Re ?? 0)}, 25 per cent baffle cut, triangular pitch.`,
         [{ symbol: "j_h", meaning: "Read from Figure 12.29" }],
-        `Open Figure 12.29. Use the 25% baffle-cut curve for triangular pitch at Re = ${sig(ammoniaFlow.Re ?? 0)}. The curve has not been digitized, so hs is not given a number here.`,
-        "Continuing with a remembered jh from Example 12.1.",
+        `Figure 12.29 is embedded below. Enter at Re = ${sig(ammoniaFlow.Re ?? 0)} on the 25 per cent baffle-cut curve for the triangular-pitch arrangement. The ordinate is not digitized, so hs is not given a number. Example 12.2 reads jh = 2.6×10⁻³ from this figure at Re = 58930; that reading belongs to the example, not to this problem.`,
+        "Continuing with a remembered jh from Example 12.1 or Example 12.2.",
+        [
+          {
+            src: "/book-assets/fig-12-29-shell-jh.png",
+            caption: "Figure 12.29. Shell-side heat-transfer factors, segmental baffles. Book p. 673.",
+            reading: `Entry coordinates: Re = ${sig(ammoniaFlow.Re ?? 0)}, baffle cut = 25%, tube arrangement = equilateral triangular. Read jh on the matching curve. No ordinate is claimed.`,
+          },
+        ],
+      ),
+      chartStep(
+        "jf",
+        "Shell-side factor jf",
+        "Equation 12.26 cannot be evaluated until jf is read at the same Reynolds number.",
+        "\\Delta P_s = 8 j_f (D_s/d_e)(L/l_B)(\\rho u_s^2/2)(\\mu/\\mu_w)^{-0.14}",
+        `Figure 12.30, p. 675. Enter at Re = ${sig(ammoniaFlow.Re ?? 0)}, 25 per cent baffle cut, triangular pitch.`,
+        [{ symbol: "j_f", meaning: "Read from Figure 12.30" }],
+        `Figure 12.30 is embedded below. Enter at Re = ${sig(ammoniaFlow.Re ?? 0)} on the 25 per cent baffle-cut curve for the triangular-pitch arrangement. The ordinate is not digitized, so the shell-side pressure drop is not given a number.`,
+        "Using the tube-side friction chart, Figure 12.24, for the shell.",
+        [
+          {
+            src: "/book-assets/fig-12-30-shell-jf.png",
+            caption: "Figure 12.30. Shell-side friction factors, segmental baffles. Book p. 674.",
+            reading: `Entry coordinates: Re = ${sig(ammoniaFlow.Re ?? 0)}, baffle cut = 25%, tube arrangement = equilateral triangular. Read jf on the matching curve. No ordinate is claimed.`,
+          },
+        ],
       ),
       blocked(
         "water",
@@ -665,7 +700,7 @@ export const questions: Question[] = [
       ),
     ],
     verification: "Requires chart or source verification",
-    verificationNote: "Duty, LMTD, R, S, Ft, area, As, de, Re, Pr and nozzle velocity were recalculated from the printed data and equations 12.4 to 12.8, 12.21 and 12.23. Equation 12.8 was also checked against Example 12.1: the book reads Ft = 0.85 and the equation gives 0.835. The shell coefficient, both pressure drops and the final suitability are not claimed. There is no answer key.",
+    verificationNote: "Duty, LMTD, R, S, Ft, area, As, de, Re, Pr and nozzle velocity were recalculated from the printed data and equations 12.4 to 12.8, 12.21 and 12.23. Equation 12.8 was also checked against Example 12.1: the book reads Ft = 0.85 and the equation gives 0.835. Figures 12.19, 12.29 and 12.30 are embedded with the entry coordinates. Their ordinates are not digitized, so the shell coefficient, both pressure drops and the final suitability are not claimed. There is no answer key.",
     finals: [
       { label: "Duty", text: "241.8 kW" },
       { label: "LMTD", text: `${sig(ammoniaLmtd.value)} °C` },

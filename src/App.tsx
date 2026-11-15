@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import { AppShell } from "./components/layout/AppShell"
 import { Dashboard } from "./pages/Dashboard"
+import { Methodology } from "./pages/Methodology"
 import { ExerciseList } from "./pages/ExerciseList"
 import { FormulaLibrary } from "./pages/FormulaLibrary"
 import { Practice } from "./pages/Practice"
@@ -13,7 +14,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<AppShell />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<Methodology />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="exercises" element={<ExerciseList />} />
           <Route path="exercises/:id" element={<QuestionPage />} />
           <Route path="formulas" element={<FormulaLibrary />} />

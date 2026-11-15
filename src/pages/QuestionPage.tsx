@@ -4,9 +4,10 @@ import { ExchangerDiagram } from "../components/Diagrams"
 import { MathText } from "../components/MathText"
 import { SolutionFlow } from "../components/SolutionFlow"
 import { questions } from "../data/questions"
+import type { Question } from "../data/types"
 import { masteryLabel, useProgress, type Mastery } from "../hooks/useProgress"
 
-const sections = ["Statement", "Understand", "Given data", "Flowchart", "Solution", "Calculator", "Exam sheet"]
+const sections = ["Statement", "Understand", "Given data", "Flowchart", "Solution", "Specification", "Calculator", "Exam sheet"]
 
 export function QuestionPage() {
   const { id = "12.5" } = useParams()
@@ -112,6 +113,7 @@ export function QuestionPage() {
           <Panel title="Missing from this PDF">{question.missing.map((item) => <p key={item}>{item}</p>)}</Panel>
         </div>
       ) : null}
+      {!exam && section === "Specification" ? <Specification question={question} /> : null}
       {!exam && section === "Flowchart" ? (
         <div className="space-y-3">
           <SolutionFlow steps={question.steps} activeId={step.id} onSelect={setStepId} />
@@ -191,7 +193,7 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
   return <section className="rounded-xl border border-line bg-surface p-4"><h3 className="font-medium">{title}</h3><div className="mt-2 space-y-1 text-sm">{children}</div></section>
 }
 
-function StepCard({ step, showWhy }: { step: { id: string; title: string; why: string; formulaTex: string; source: string; variables: { symbol: string; meaning: string }[]; substitutionTex: string; arithmetic: string[]; resultText: string; verification: string; mistake: string; status: string }; showWhy: boolean }) {
+function StepCard({ step, showWhy }: { step: { id: string; title: string; why: string; formulaTex: string; source: string; variables: { symbol: string; meaning: string }[]; substitutionTex: string; arithmetic: string[]; resultText: string; verification: string; mistake: string; status: string; figures?: { src: string; caption: string; reading: string }[] }; showWhy: boolean }) {
   return (
     <article id={step.id} className="rounded-xl border border-line bg-surface p-4">
       <div className="flex items-center justify-between gap-3">
@@ -205,9 +207,74 @@ function StepCard({ step, showWhy }: { step: { id: string; title: string; why: s
       <div className="mt-2"><MathText tex={step.substitutionTex} display /></div>
       <ol className="num mt-2 list-decimal space-y-1 pl-5 text-sm">{step.arithmetic.map((line) => <li key={line}>{line}</li>)}</ol>
       <p className="mt-3 font-medium">Result: <span className="num">{step.resultText}</span></p>
+      {step.figures?.map((figure) => (
+        <figure key={figure.src} className="mt-4 overflow-hidden rounded-lg border border-line bg-white text-slate-900">
+          <img src={figure.src} alt={figure.caption} className="max-h-[34rem] w-full object-contain" />
+          <figcaption className="space-y-1 border-t border-slate-200 px-3 py-2 text-sm">
+            <p className="font-medium">{figure.caption}</p>
+            <p>{figure.reading}</p>
+          </figcaption>
+        </figure>
+      ))}
       <p className="mt-1 text-sm"><strong>Verification: </strong>{step.verification}</p>
       <p className="mt-1 text-sm"><strong>Common mistake: </strong>{step.mistake}</p>
     </article>
+  )
+}
+
+const specRows = [
+  ["Shell ID", "Ds"],
+  ["Baffle spacing", "lB"],
+  ["Baffle cut", "Bc"],
+  ["Tube OD", "do"],
+  ["Tube ID", "di"],
+  ["Tube length", "L"],
+  ["Number of tubes", "Nt"],
+  ["Pitch", "pt"],
+  ["Passes", "Np"],
+] as const
+
+function givenValue(question: Question, symbol: string) {
+  const row = question.given.find((item) => item.symbol === symbol)
+  return row ? `${row.value} ${row.unit}` : "Not determined. The problem does not fix this dimension."
+}
+
+function Specification({ question }: { question: Question }) {
+  const finals = [
+    ["U calculated", "Not determined. The film coefficients are not closed."],
+    ["Area overdesign", "Not determined. It needs both the required area and a completed U."],
+    ["Tube-side pressure drop", "Not determined. A required property or chart reading is still missing."],
+    ["Shell-side pressure drop", "Not determined. A required property or chart reading is still missing."],
+  ]
+  return (
+    <section className="overflow-hidden rounded-xl border border-line bg-surface">
+      <div className="border-b border-line px-4 py-3">
+        <h3 className="font-semibold">Specification summary</h3>
+        <p className="text-sm text-muted">Geometry is copied from the problem statement. A result is filled only when this chapter’s data close it.</p>
+      </div>
+      <table className="w-full text-left text-sm">
+        <tbody>
+          {specRows.map(([label, symbol]) => (
+            <tr key={symbol} className="border-t border-line">
+              <th className="px-4 py-2 font-medium">{label}</th>
+              <td className="num px-4 py-2">{givenValue(question, symbol)}</td>
+            </tr>
+          ))}
+          {question.finals.map((item) => (
+            <tr key={item.label} className="border-t border-line">
+              <th className="px-4 py-2 font-medium">{item.label}</th>
+              <td className="num px-4 py-2">{item.text}</td>
+            </tr>
+          ))}
+          {finals.map(([label, text]) => (
+            <tr key={label} className="border-t border-line">
+              <th className="px-4 py-2 font-medium">{label}</th>
+              <td className="px-4 py-2 text-muted">{text}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
   )
 }
 
@@ -226,8 +293,15 @@ export function ExamSheet({ questionId }: { questionId: string }) {
           <MathText tex={step.formulaTex} display />
           <p className="num text-sm">{step.arithmetic.join(" · ")}</p>
           <p><strong>Result: </strong><span className="num">{step.resultText}</span></p>
+          {step.figures?.map((figure) => (
+            <figure key={figure.src} className="mt-2 bg-white text-slate-900">
+              <img src={figure.src} alt={figure.caption} className="max-h-80 w-full object-contain" />
+              <figcaption className="px-2 py-1 text-sm">{figure.caption} {figure.reading}</figcaption>
+            </figure>
+          ))}
         </section>
       ))}
+      <Specification question={question} />
       <div>
         <h3 className="font-medium">Final answer</h3>
         {question.finals.map((item) => <p key={item.label}><strong>{item.label}: </strong><span className="num">{item.text}</span></p>)}

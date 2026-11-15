@@ -5,6 +5,12 @@ export type Variable = {
 
 export type StepStatus = "computed" | "blocked" | "chart"
 
+export type BookFigure = {
+  src: string
+  caption: string
+  reading: string
+}
+
 export type Step = {
   id: string
   title: string
@@ -20,6 +26,7 @@ export type Step = {
   verification: string
   mistake: string
   status: StepStatus
+  figures?: BookFigure[]
 }
 
 export type GivenRow = {
